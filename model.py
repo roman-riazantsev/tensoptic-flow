@@ -4,7 +4,6 @@ from tensorflow.keras.layers import concatenate, Conv2DTranspose
 from custom_layers.cost_volume_layer import CostVolumeLayer
 from custom_layers.flow_estimator import FlowEstimator
 from custom_layers.feature_extractor import FeatureExtractor
-from custom_layers.upsample_layer import UpsampleLayer
 from custom_layers.warp_layer import WarpLayer
 
 
