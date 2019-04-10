@@ -1,10 +1,10 @@
-from tensorflow.python.keras.layers import Conv2D
+from tensorflow.keras.layers import Conv2D
 from tensorflow.keras import layers
 
 
-class PyramidalProcessor(layers.Layer):
+class FeatureExtractor(layers.Layer):
     def __init__(self):
-        super(PyramidalProcessor, self).__init__()
+        super(FeatureExtractor, self).__init__()
 
     @staticmethod
     def call(inputs):
