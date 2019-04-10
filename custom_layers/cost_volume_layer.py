@@ -13,7 +13,7 @@ class CostVolumeLayer(layers.Layer):
         super(CostVolumeLayer, self).__init__()
 
     @staticmethod
-    def call(name, c1, warp, search_range):
+    def call(c1, warp, search_range=4):
         """Build cost volume for associating a pixel from Image1 with its corresponding pixels in Image2.
             Args:
                 c1: Level of the feature pyramid of Image1
@@ -31,6 +31,6 @@ class CostVolumeLayer(layers.Layer):
                 cost = tf.reduce_mean(c1 * slice, axis=3, keepdims=True)
                 cost_vol.append(cost)
         cost_vol = tf.concat(cost_vol, axis=3)
-        cost_vol = tf.nn.leaky_relu(cost_vol, alpha=0.1, name=name)
+        cost_vol = tf.nn.leaky_relu(cost_vol, alpha=0.1)
 
         return cost_vol

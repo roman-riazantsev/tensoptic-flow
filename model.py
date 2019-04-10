@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.python.keras.layers import concatenate
+from tensorflow.keras.layers import concatenate, Conv2DTranspose
 
 from custom_layers.cost_volume_layer import CostVolumeLayer
 from custom_layers.flow_estimator import FlowEstimator
@@ -10,14 +10,14 @@ from custom_layers.warp_layer import WarpLayer
 
 # noinspection PyCallingNonCallable
 class Model(tf.keras.Model):
-    def __init__(self, name='PWC-net', **kwargs):
-        super(Model, self).__init__(name=name, **kwargs)
+    def __init__(self, name='PWC-net'):
+        super(Model, self).__init__(name=name)
 
         self.feature_extractor = FeatureExtractor()
         self.cost_volume_layer = CostVolumeLayer()
         self.flow_estimators = [FlowEstimator() for _ in range(6)]
         self.warp_layer = WarpLayer()
-        self.upsample_layer = UpsampleLayer()
+        # self.upsample_layer =
 
     def call(self, inputs):
         flows = []
@@ -44,7 +44,8 @@ class Model(tf.keras.Model):
 
         return flows
 
-    def computation_step(self, first_frame_features, second_frame_features, old_flow_features, old_flow, flow_estimator):
+    def computation_step(self, first_frame_features, second_frame_features, old_flow_features, old_flow,
+                         flow_estimator):
         if old_flow is None:
             cost_vol_output = self.cost_volume_layer(first_frame_features, second_frame_features)
             flow_estimator_input = cost_vol_output
@@ -55,7 +56,7 @@ class Model(tf.keras.Model):
 
         new_flow_features, new_flow = flow_estimator(flow_estimator_input)
 
-        features = self.upsample_layer(new_flow_features)
-        flow = self.upsample_layer(new_flow)
+        features = Conv2DTranspose(filters=2, kernel_size=4, strides=2, padding='same')(new_flow_features)
+        flow = Conv2DTranspose(filters=2, kernel_size=4, strides=2, padding='same')(new_flow)
 
         return features, flow
