@@ -1,0 +1,16 @@
+**/*.pyc
+**/__pycache__/*
+*.npz
+*.pyc
+.idea/*
+results/*
+datasets/*
+test_board/*
+test_log/*
+test/*
+configs/*
+venv/*
+prototypes/.ipynb_checkpoints/*
+.ipynb_checkpoints/*
+**/.ipynb_checkpoints
+
