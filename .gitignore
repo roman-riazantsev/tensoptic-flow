@@ -5,6 +5,7 @@
 .idea/*
 results/*
 datasets/*
+logs/*
 test_board/*
 test_log/*
 test/*

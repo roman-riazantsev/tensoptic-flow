@@ -12,6 +12,10 @@ class ModelTrainer(object):
         self.loader = loader
         self.model = model
 
+        self.loss_metric = tf.keras.metrics.Mean('train_loss', dtype=tf.float32)
+        self.log_dir = 'logs/gradient_tape/PWC/train'
+        self.summary_writer = tf.summary.create_file_writer(self.log_dir)
+
     def train(self, n_epochs):
         for epoch in range(n_epochs):
             frame_1, frame_2, flow = self.loader.next_batch()
@@ -20,39 +24,46 @@ class ModelTrainer(object):
 
             resized_flows = []
 
-            for i in dimensions:
+            for dim in dimensions:
                 resized_flow = []
                 for img in flow:
-                    img = cv2.resize(img, i)
-                    img[..., 0] /= (i[0] / self.config['img_width'])
-                    img[..., 1] /= (i[1] / self.config['img_height'])
+                    img = cv2.resize(img, dim)
+                    img[..., 0] /= (dim[0] / self.config['img_width'])
+                    img[..., 1] /= (dim[1] / self.config['img_height'])
                     resized_flow.append(img)
                 resized_flow = np.array(resized_flow)
                 resized_flows.append(resized_flow)
 
-            total_loss = self.train_step(frame_1, frame_2, resized_flows)
-            # Log every 10 batches.
-            if epoch % 10 == 0:
-                print('Training loss at step {}: {}'.format(epoch, np.array(total_loss).mean()))
-                print('Seen so far: {} samples'.format((epoch + 1) * 1))
+            self.train_step(frame_1, frame_2, resized_flows)
+
+            with self.summary_writer.as_default():
+                tf.summary.scalar('loss', self.loss_metric.result(), step=epoch)
+
+            template = 'Epoch {}, Loss: {}'
+            print(template.format(epoch + 1,
+                                  self.loss_metric.result()))
+
+            # Reset metrics every epoch
+            self.loss_metric.reset_states()
 
     def train_step(self, frame_1, frame_2, resized_flows):
         with tf.GradientTape() as tape:
-            pred_flows = self.model([frame_1, frame_2])  # Logits for this minibatchv
+            pred_flows = self.model([frame_1, frame_2])
             losses = []
+            loss_normalizations = [0.32, 0.08, 0.02, 0.01, 0.005, 2]
 
-            for true_flow, pred_flow in zip(resized_flows, pred_flows):
-                true_flow_paded = pad_batch(true_flow, data_type='numpy')
-                pred_flow_paded = pad_batch(pred_flow, data_type='tensor')
+            for true_flow, pred_flow, loss_norm in zip(resized_flows, pred_flows, loss_normalizations):
+                true_flow_padded = pad_batch(true_flow, data_type='numpy')
+                pred_flow_padded = pad_batch(pred_flow, data_type='tensor')
 
-                loss_value = keras.losses.mse(true_flow_paded, pred_flow_paded)
+                loss_value = keras.losses.mse(true_flow_padded, pred_flow_padded)
+                loss_value *= loss_norm
                 losses.append(loss_value)
 
-            total_loss = sum(losses)
+            loss = sum(losses)
 
-            grads = tape.gradient(total_loss, self.model.trainable_variables)
-
-            optimizer = keras.optimizers.Adam()
+            grads = tape.gradient(loss, self.model.trainable_variables)
+            optimizer = keras.optimizers.Adam(lr=self.config['learning_rate'])
             optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
 
-            return total_loss
+            self.loss_metric(loss)
