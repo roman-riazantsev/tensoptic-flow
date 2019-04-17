@@ -14,5 +14,5 @@ venv/*
 prototypes/.ipynb_checkpoints/*
 .ipynb_checkpoints/*
 **/.ipynb_checkpoints
-
+saves/*
 
