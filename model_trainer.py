@@ -80,6 +80,6 @@ class ModelTrainer(object):
 
     def load_model(self):
         if os.path.exists(self.config['save_path']):
-            self.model.load_weights()
+            self.model.load_weights(self.config['save_path'])
         else:
             os.makedirs(self.config['save_path'])
