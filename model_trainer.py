@@ -1,3 +1,5 @@
+import os
+
 import tensorflow as tf
 import tensorflow.keras as keras
 import cv2
@@ -16,7 +18,11 @@ class ModelTrainer(object):
         self.log_dir = 'logs/gradient_tape/PWC/train'
         self.summary_writer = tf.summary.create_file_writer(self.log_dir)
 
+        self.save_rate = config['save_rate']
+
     def train(self, n_epochs):
+        self.load_model()
+
         for epoch in range(n_epochs):
             frame_1, frame_2, flow = self.loader.next_batch()
 
@@ -40,10 +46,11 @@ class ModelTrainer(object):
                 tf.summary.scalar('loss', self.loss_metric.result(), step=epoch)
 
             template = 'Epoch {}, Loss: {}'
-            print(template.format(epoch + 1,
-                                  self.loss_metric.result()))
+            print(template.format(epoch + 1, self.loss_metric.result()))
 
-            # Reset metrics every epoch
+            if epoch % self.save_rate == 0:
+                self.save_model()
+
             self.loss_metric.reset_states()
 
     def train_step(self, frame_1, frame_2, resized_flows):
@@ -67,3 +74,10 @@ class ModelTrainer(object):
             optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
 
             self.loss_metric(loss)
+
+    def save_model(self):
+        self.model.save_weights(self.config['save_path'], save_format='tf')
+
+    def load_model(self):
+        if len(os.listdir(self.config['save_path'])) != 0:
+            self.model.load_weights(self.config['save_path'])

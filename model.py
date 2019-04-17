@@ -16,7 +16,6 @@ class Model(tf.keras.Model):
         self.cost_volume_layer = CostVolumeLayer()
         self.flow_estimators = [FlowEstimator() for _ in range(6)]
         self.warp_layer = WarpLayer()
-        # self.upsample_layer =
 
     def call(self, inputs):
         flows = []

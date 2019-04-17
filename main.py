@@ -9,7 +9,9 @@ config = {
     'img_height': 192,
     'img_width': 256,
     'batch_size': 2,
-    'learning_rate': 0.0001
+    'learning_rate': 0.0001,
+    'save_rate': 10,
+    'save_path': 'saves/'
 }
 # 2) create dataset loader
 loader = ChairsDatasetLoader(config)
