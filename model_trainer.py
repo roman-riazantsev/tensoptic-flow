@@ -79,5 +79,7 @@ class ModelTrainer(object):
         self.model.save_weights(self.config['save_path'], save_format='tf')
 
     def load_model(self):
-        if len(os.listdir(self.config['save_path'])) != 0:
-            self.model.load_weights(self.config['save_path'])
+        if os.path.exists(self.config['save_path']):
+            self.model.load_weights()
+        else:
+            os.makedirs(self.config['save_path'])
