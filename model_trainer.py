@@ -20,10 +20,10 @@ class ModelTrainer(object):
 
         self.save_rate = config['save_rate']
 
-    def train(self, n_epochs):
+    def train(self, n_steps):
         self.load_model()
 
-        for epoch in range(n_epochs):
+        for step in range(n_steps):
             frame_1, frame_2, flow = self.loader.next_batch()
 
             dimensions = [(8, 6), (16, 12), (32, 24), (65, 48), (128, 96), (256, 192)]
@@ -43,12 +43,12 @@ class ModelTrainer(object):
             self.train_step(frame_1, frame_2, resized_flows)
 
             with self.summary_writer.as_default():
-                tf.summary.scalar('loss', self.loss_metric.result(), step=epoch)
+                tf.summary.scalar('loss', self.loss_metric.result(), step=step)
 
-            template = 'Epoch {}, Loss: {}'
-            print(template.format(epoch + 1, self.loss_metric.result()))
+            template = 'Step {}, Loss: {}'
+            print(template.format(step + 1, self.loss_metric.result()))
 
-            if epoch % self.save_rate == 0:
+            if step % self.save_rate == 0:
                 self.save_model()
 
             self.loss_metric.reset_states()

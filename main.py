@@ -8,7 +8,7 @@ config = {
     'dataset_dir_path': "../../Datasets/FlyingChairs_release/data",
     'img_height': 192,
     'img_width': 256,
-    'batch_size': 2,
+    'batch_size': 4,
     'learning_rate': 0.0001,
     'save_rate': 10,
     'save_path': 'saves/'
@@ -19,4 +19,4 @@ loader = ChairsDatasetLoader(config)
 model = Model()
 # 4) run
 trainer = ModelTrainer(config, loader, model)
-trainer.train(n_epochs=1000)
+trainer.train(n_steps=1000)
