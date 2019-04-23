@@ -8,7 +8,7 @@ import numpy as np
 from utils import pad_batch
 
 
-class ModelTrainer(object):
+class ModelTrainer2(object):
     def __init__(self, config, loader, model):
         self.config = config
         self.loader = loader
@@ -56,25 +56,23 @@ class ModelTrainer(object):
     def train_step(self, frame_1, frame_2, resized_flows):
         with tf.GradientTape() as tape:
             pred_flows = self.model([frame_1, frame_2])
-            losses = []
-            loss_normalizations = [0.32, 0.08, 0.02, 0.01, 0.005, 2]
-            loss_normalizations = [1, 0.1, 0.05, 1]
+            total_loss = 0.
+            loss_normalizations = [0.02, 0.01, 0.005, 2]
 
             for true_flow, pred_flow, loss_norm in zip(resized_flows, pred_flows, loss_normalizations):
-                true_flow_padded = pad_batch(true_flow, data_type='numpy')
-                pred_flow_padded = pad_batch(pred_flow, data_type='tensor')
+                normed_loss = tf.norm(true_flow - pred_flow, ord=2, axis=3)
+                lvl_loss = tf.reduce_mean(tf.reduce_sum(normed_loss, axis=(1, 2)))
+                total_loss += lvl_loss * loss_norm
 
-                loss_value = keras.losses.mse(true_flow_padded, pred_flow_padded)
-                loss_value *= loss_norm
-                losses.append(loss_value)
+            gamma = 0.0004
+            loss_regularization = gamma * tf.reduce_sum([tf.nn.l2_loss(var) for var in self.model.trainable_weights])
+            total_loss += loss_regularization
 
-            loss = sum(losses)
-
-            grads = tape.gradient(loss, self.model.trainable_variables)
+            grads = tape.gradient(total_loss, self.model.trainable_variables)
             optimizer = keras.optimizers.Adam(lr=self.config['learning_rate'])
             optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
 
-            self.loss_metric(loss)
+            self.loss_metric(total_loss)
 
     def save_model(self):
         self.model.save_weights(self.config['save_path'], save_format='tf')

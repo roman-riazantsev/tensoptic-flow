@@ -8,7 +8,7 @@ import numpy as np
 from utils import pad_batch
 
 
-class ModelTrainer(object):
+class TrainerLVL1(object):
     def __init__(self, config, loader, model):
         self.config = config
         self.loader = loader
@@ -56,25 +56,14 @@ class ModelTrainer(object):
     def train_step(self, frame_1, frame_2, resized_flows):
         with tf.GradientTape() as tape:
             pred_flows = self.model([frame_1, frame_2])
-            losses = []
-            loss_normalizations = [0.32, 0.08, 0.02, 0.01, 0.005, 2]
-            loss_normalizations = [1, 0.1, 0.05, 1]
 
-            for true_flow, pred_flow, loss_norm in zip(resized_flows, pred_flows, loss_normalizations):
-                true_flow_padded = pad_batch(true_flow, data_type='numpy')
-                pred_flow_padded = pad_batch(pred_flow, data_type='tensor')
+            loss_value = keras.losses.mse(resized_flows[0], pred_flows[0])
 
-                loss_value = keras.losses.mse(true_flow_padded, pred_flow_padded)
-                loss_value *= loss_norm
-                losses.append(loss_value)
-
-            loss = sum(losses)
-
-            grads = tape.gradient(loss, self.model.trainable_variables)
+            grads = tape.gradient(loss_value, self.model.trainable_variables)
             optimizer = keras.optimizers.Adam(lr=self.config['learning_rate'])
             optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
 
-            self.loss_metric(loss)
+            self.loss_metric(loss_value)
 
     def save_model(self):
         self.model.save_weights(self.config['save_path'], save_format='tf')

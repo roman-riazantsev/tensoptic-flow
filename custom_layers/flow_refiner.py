@@ -29,7 +29,6 @@ class FlowRefiner(layers.Layer):
         x = self.conv_6(x)
         x = tf.nn.leaky_relu(x, alpha=0.1)
         x = self.conv_7(x)
-        x = tf.nn.leaky_relu(x, alpha=0.1)
 
         refined_flow = flow + x
 

@@ -19,7 +19,7 @@ class ChairsDatasetLoader(BaseLoader):
 
             if train_set_size == 0:
                 dataset_size = len(feature_paths)
-                test_set_size = 600
+                test_set_size = 700
                 train_set_size = dataset_size - test_set_size
 
             test_paths = feature_paths[train_set_size:]
