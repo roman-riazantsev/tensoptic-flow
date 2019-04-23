@@ -32,4 +32,5 @@ class FlowRefiner(layers.Layer):
         x = tf.nn.leaky_relu(x, alpha=0.1)
 
         refined_flow = flow + x
+
         return refined_flow

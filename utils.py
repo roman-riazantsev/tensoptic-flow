@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 
-def pad_batch(batch, data_type, max_in_dims=[48, 65], constant_values=0):
+def pad_batch(batch, data_type, max_in_dims=[48, 64], constant_values=0):
     if data_type == 'numpy':
         default_shape = batch.shape
     else:

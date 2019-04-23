@@ -26,7 +26,7 @@ class ModelTrainer(object):
         for step in range(n_steps):
             frame_1, frame_2, flow = self.loader.next_batch()
 
-            dimensions = [(8, 6), (16, 12), (32, 24), (65, 48)]
+            dimensions = [(8, 6), (16, 12), (32, 24), (64, 48)]
 
             resized_flows = []
 
@@ -55,7 +55,7 @@ class ModelTrainer(object):
 
     def train_step(self, frame_1, frame_2, resized_flows):
         with tf.GradientTape() as tape:
-            pred_features, pred_flows = self.model([frame_1, frame_2])
+            pred_flows = self.model([frame_1, frame_2])
             losses = []
             loss_normalizations = [0.32, 0.08, 0.02, 0.01, 0.005, 2]
             loss_normalizations = [0.05, 0.02, 0.005, 2]

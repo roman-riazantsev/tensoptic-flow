@@ -4,6 +4,7 @@ from tensorflow.keras.layers import concatenate, Conv2DTranspose
 from custom_layers.cost_volume_layer import CostVolumeLayer
 from custom_layers.flow_estimator import FlowEstimator
 from custom_layers.feature_extractor import FeatureExtractor
+from custom_layers.flow_refiner import FlowRefiner
 from custom_layers.warp_layer import WarpLayer
 
 
@@ -14,6 +15,7 @@ class Model(tf.keras.Model):
 
         self.feature_extractor = FeatureExtractor()
         self.cost_volume_layer = CostVolumeLayer()
+        self.flow_refiner = FlowRefiner()
         self.flow_estimators = [FlowEstimator() for _ in range(4)]
         self.warp_layer = WarpLayer()
 
@@ -42,7 +44,11 @@ class Model(tf.keras.Model):
             flows.append(flow)
             features_list.append(features)
 
-        return features_list, flows
+        last_features, last_flow = features_list[-1], flows[-1]
+
+        refined_flow = self.flow_refiner(last_features, last_flow)
+        flows[-1] = refined_flow
+        return flows
 
     def computation_step(self, first_frame_features, second_frame_features, old_flow_features, old_flow,
                          flow_estimator):
