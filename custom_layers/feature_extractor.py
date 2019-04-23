@@ -41,7 +41,6 @@ class FeatureExtractor(layers.Layer):
         x = tf.nn.leaky_relu(x, alpha=0.1)
         x = self.conv_1_c(x)
         x = tf.nn.leaky_relu(x, alpha=0.1)
-        lvls.append(x)
 
         x = self.conv_2_a(x)
         x = tf.nn.leaky_relu(x, alpha=0.1)
@@ -49,7 +48,6 @@ class FeatureExtractor(layers.Layer):
         x = tf.nn.leaky_relu(x, alpha=0.1)
         x = self.conv_2_c(x)
         x = tf.nn.leaky_relu(x, alpha=0.1)
-        lvls.append(x)
 
         x = self.conv_3_a(x)
         x = tf.nn.leaky_relu(x, alpha=0.1)

@@ -14,11 +14,12 @@ class Model(tf.keras.Model):
 
         self.feature_extractor = FeatureExtractor()
         self.cost_volume_layer = CostVolumeLayer()
-        self.flow_estimators = [FlowEstimator() for _ in range(6)]
+        self.flow_estimators = [FlowEstimator() for _ in range(4)]
         self.warp_layer = WarpLayer()
 
     def call(self, inputs):
         flows = []
+        features_list = []
 
         first_frame_pyramid = self.feature_extractor(inputs[0])
         second_frame_pyramid = self.feature_extractor(inputs[1])
@@ -26,7 +27,7 @@ class Model(tf.keras.Model):
         old_flow_features = None
         old_flow = None
 
-        for lvl in range(5, -1, -1):
+        for lvl in range(3, -1, -1):
             first_frame_features = first_frame_pyramid[lvl]
             second_frame_features = second_frame_pyramid[lvl]
             flow_estimator = self.flow_estimators[lvl]
@@ -39,8 +40,9 @@ class Model(tf.keras.Model):
                 flow_estimator=flow_estimator
             )
             flows.append(flow)
+            features_list.append(features)
 
-        return flows
+        return features_list, flows
 
     def computation_step(self, first_frame_features, second_frame_features, old_flow_features, old_flow,
                          flow_estimator):
