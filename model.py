@@ -47,7 +47,7 @@ class Model(tf.keras.Model):
         last_features, last_flow = features_list[-1], flows[-1]
 
         refined_flow = self.flow_refiner(last_features, last_flow)
-        flows[-1] = refined_flow
+        flows.append(refined_flow)
         return flows
 
     def computation_step(self, first_frame_features, second_frame_features, old_flow_features, old_flow,

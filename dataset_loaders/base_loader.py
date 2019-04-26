@@ -23,7 +23,7 @@ class BaseLoader(object):
         subset_size = self.train_set_size if subset == "train" else self.test_set_size
 
         for i in range(self.batch_size):
-            idx = random.randint(0, subset_size - 1)
+            idx = random.randint(0, subset_size - 1000)
 
             for feature_number, feature_info in enumerate(self.features_info):
                 process_data = feature_info['processing_function']
@@ -39,5 +39,5 @@ class BaseLoader(object):
         else:
             is_rgb = True
         img = cv2.imread(path_to_image, is_rgb)
-        img = cv2.resize(img, (self.img_height, self.img_width)).reshape([self.img_height, self.img_width, -1])
-        return img
+        img = cv2.resize(img, (self.img_width, self.img_height)).reshape([self.img_height, self.img_width, -1])
+        return img / 255

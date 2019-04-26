@@ -61,5 +61,5 @@ class ChairsDatasetLoader(BaseLoader):
 
         flow = cv2.resize(flow, (self.img_width, self.img_height))
         flow[..., 0] /= (self.img_width / width)
-        flow[..., 1] /= (self.img_width / width)
+        flow[..., 1] /= (self.img_height / height)
         return flow
