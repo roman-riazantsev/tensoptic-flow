@@ -1,20 +1,13 @@
+from config import CONFIG
 from dataset_loaders.chairs_dataset_loader import ChairsDatasetLoader
-from model import Model
-
+from logger import Logger
 from model import Model
 from model_trainer import ModelTrainer
+from utils.config_utils import initialize_results_dir
 
-config = {
-    'dataset_dir_path': "../../Datasets/FlyingChairs_release/data",
-    'img_height': 192,
-    'img_width': 256,
-    'batch_size': 8,
-    'learning_rate': 0.0001,
-    'save_rate': 10,
-    'save_path': 'saves/'
-}
-
+config = initialize_results_dir(CONFIG)
 loader = ChairsDatasetLoader(config)
-model = Model()
-trainer = ModelTrainer(config, loader, model)
-trainer.train(n_steps=2000)
+model = Model(config['model'])
+logger = Logger(config)
+trainer = ModelTrainer(config, loader, model, logger)
+trainer.train(n_steps=10000)

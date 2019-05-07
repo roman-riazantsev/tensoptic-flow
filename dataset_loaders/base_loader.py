@@ -23,7 +23,7 @@ class BaseLoader(object):
         subset_size = self.train_set_size if subset == "train" else self.test_set_size
 
         for i in range(self.batch_size):
-            idx = random.randint(0, subset_size - 1000)
+            idx = random.randint(0, subset_size - 2)
 
             for feature_number, feature_info in enumerate(self.features_info):
                 process_data = feature_info['processing_function']
