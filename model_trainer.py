@@ -17,6 +17,7 @@ class ModelTrainer(object):
         self.saved_step_path = config['saved_step_path']
         self.saves_dir_path = config['saves_dir_path']
         self.save_rate = config['save_rate']
+        self.img_log_rate = config['img_log_rate']
 
     def train(self, n_steps):
         self.load_model()
@@ -32,8 +33,10 @@ class ModelTrainer(object):
 
             if self.step % self.save_rate == 0:
                 self.logger.log_loss(self.step)
-                self.logger.log_flows(scaled_flows_gt, pred_flows, self.step)
                 self.save_model()
+
+            if self.step % self.img_log_rate == 0:
+                self.logger.log_flows(scaled_flows_gt, pred_flows, self.step)
 
             self.logger.reset_loss_states()
             self.step += 1

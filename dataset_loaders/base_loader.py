@@ -24,6 +24,7 @@ class BaseLoader(object):
 
         for i in range(self.batch_size):
             idx = random.randint(0, subset_size - 2)
+            print(subset_size)
 
             for feature_number, feature_info in enumerate(self.features_info):
                 process_data = feature_info['processing_function']
