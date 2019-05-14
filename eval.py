@@ -6,11 +6,11 @@ from model_evalutaor import ModelEvaluator
 from utils.config_utils import initialize_results_dir
 
 CONFIG = {
-    'dataset_dir_path': "../datasets/FlyingChairs/FlyingChairs_release/data",
+    'dataset_dir_path': "../../Datasets/FlyingChairs_release/data",
     'img_height': 384,
     'img_width': 512,
     'batch_size': 1,
-    'train_set_size': 7000,
+    'train_set_size': 21000,
     'n_steps': 1000,
     'model': {
         'model_type': 'PWC',

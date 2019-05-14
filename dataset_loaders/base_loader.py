@@ -24,7 +24,6 @@ class BaseLoader(object):
 
         for i in range(self.batch_size):
             idx = random.randint(0, subset_size - 2)
-            print(subset_size)
 
             for feature_number, feature_info in enumerate(self.features_info):
                 process_data = feature_info['processing_function']
@@ -33,6 +32,22 @@ class BaseLoader(object):
                 batch[feature_number][i] = process_data(path, depth)
 
         return batch
+
+    def get_observation(self, idx, subset="test"):
+        observation = []
+
+        for feature_info in self.features_info:
+            feature = np.empty([self.batch_size, self.img_height, self.img_width, feature_info['depth']],
+                               dtype=np.float32)
+            observation.append(feature)
+
+        for feature_number, feature_info in enumerate(self.features_info):
+            process_data = feature_info['processing_function']
+            path = feature_info['paths'][subset][idx]
+            depth = feature_info['depth']
+            observation[feature_number][0] = process_data(path, depth)
+
+        return observation
 
     def process_img(self, path_to_image, depth):
         if depth == 1:

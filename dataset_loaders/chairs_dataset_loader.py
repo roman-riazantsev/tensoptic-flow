@@ -22,6 +22,7 @@ class ChairsDatasetLoader(BaseLoader):
                 train_set_size = self.train_set_size
                 test_set_size = dataset_size - train_set_size
 
+
             test_paths = feature_paths[train_set_size:]
             train_paths = feature_paths[:train_set_size - 1]
 
